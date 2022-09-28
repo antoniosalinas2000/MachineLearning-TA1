@@ -85,20 +85,20 @@ class Stl:
 
 @dataclass
 class Obj:
-    positions: list[list[float]]
+    pos: list[list[float]]
     normals: list[list[float]]
     tcoords: list[list[float]]
     faces: list[list[list[int]]]
 
     def __repr__(self):
-        return f"Wavefront\nInfo : (v:{len(self.positions)}, vn:{len(self.normals)}, vt:{len(self.tcoords)}, f:{len(self.faces)})"
+        return f"Wavefront\nInfo : (v:{len(self.pos)}, vn:{len(self.normals)}, vt:{len(self.tcoords)}, f:{len(self.faces)})"
 
     def to_stl(self) -> Stl:
         stl = Stl.generate_empty()
 
         for face in self.faces:
             face = list(zip(*face))
-            v1, v2, v3 = [Vec3(*self.positions[a]) for a in face[0]]
+            v1, v2, v3 = [Vec3(*self.pos[a]) for a in face[0]]
             n = Vec3(*self.normals[face[2][0]])
 
             stl.add_triangle_normal(n, v1, v2, v3)
@@ -107,7 +107,7 @@ class Obj:
 
     @classmethod
     def read(cls, filename):
-        positions = []
+        pos = []
         normals = []
         tcoords = []
         faces = []
@@ -121,7 +121,7 @@ class Obj:
 
                 if line[0] == 'v':
                     p = list(map(float, line[1:]))
-                    positions.append([p[0], p[2], p[1]])
+                    pos.append([p[0], p[2], p[1]])
                 elif line[0] == 'vn':
                     n = list(map(float, line[1:]))
                     normals.append([n[0], n[2], n[1]])
@@ -137,4 +137,4 @@ class Obj:
                         faces.append([vertex[0], vertex[3], vertex[1]])
                         faces.append([vertex[2], vertex[1], vertex[3]])
 
-        return Obj(positions, normals, tcoords, faces)
+        return Obj(pos, normals, tcoords, faces)
