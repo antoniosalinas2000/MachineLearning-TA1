@@ -1,7 +1,7 @@
-from obj_converter import Wavefront
+from obj_converter import Obj
 
 if __name__ == '__main__':
-    obj = Wavefront.read("models/obj/Rick.obj")
+    obj = Obj.read("models/obj/Rick.obj")
     stl = obj.to_stl()
 
     print("")

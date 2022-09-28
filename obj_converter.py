@@ -80,18 +80,30 @@ class Stl:
                 triangle.write(f)
     
     def __repr__(self):
-        return f"Stl('{self.header}', Triangles({len(self.triangles)}))"
+        return f"Stl\nInfo: ('{self.header}', Triangles({len(self.triangles)}))"
 
 
 @dataclass
-class Wavefront:
+class Obj:
     positions: list[list[float]]
     normals: list[list[float]]
     tcoords: list[list[float]]
     faces: list[list[list[int]]]
 
     def __repr__(self):
-        return f"Wavefront(v:{len(self.positions)}, vn:{len(self.normals)}, vt:{len(self.tcoords)}, f:{len(self.faces)})"
+        return f"Wavefront\nInfo : (v:{len(self.positions)}, vn:{len(self.normals)}, vt:{len(self.tcoords)}, f:{len(self.faces)})"
+
+    def to_stl(self) -> Stl:
+        stl = Stl.generate_empty()
+
+        for face in self.faces:
+            face = list(zip(*face))
+            v1, v2, v3 = [Vec3(*self.positions[a]) for a in face[0]]
+            n = Vec3(*self.normals[face[2][0]])
+
+            stl.add_triangle_normal(n, v1, v2, v3)
+
+        return stl
 
     @classmethod
     def read(cls, filename):
@@ -125,16 +137,4 @@ class Wavefront:
                         faces.append([vertex[0], vertex[3], vertex[1]])
                         faces.append([vertex[2], vertex[1], vertex[3]])
 
-        return Wavefront(positions, normals, tcoords, faces)
-
-    def to_stl(self) -> Stl:
-        stl = Stl.generate_empty()
-
-        for face in self.faces:
-            face = list(zip(*face))
-            v1, v2, v3 = [Vec3(*self.positions[a]) for a in face[0]]
-            n = Vec3(*self.normals[face[2][0]])
-
-            stl.add_triangle_normal(n, v1, v2, v3)
-
-        return stl
+        return Obj(positions, normals, tcoords, faces)
